@@ -19,9 +19,8 @@ $$ \sum_i P_{ij}=1 $$
 
 **Real-Time Maximum Likelihood Estimation (MLE)**
 As the user plays, the Data Pipeline continuously captures the state transitions. To keep the model lightweight and fast, the transition matrix is dynamically estimated in real-time using a Maximum Likelihood Estimator (MLE) approach. The C# producer-consumer queue updates the transition counts $n_{ij}$ (the number of times the user transitioned from state $i$ to state $j$). The transition probability is thus calculated continuously as:
-$$
-\hat{p}_{ij}^{MLE} = \frac{n_{ij}}{\sum_{u = 1}^k n_{iu}}
-$$
+p_hat_ij^MLE = n_ij / sum(n_iu) para u=1 hasta k
+
 
 **Inference and Counter-Move Prediction**
 During the inference phase, the AI must predict the user's next action to select the optimal counter-move. Given the user's current state $X_{t}=s_{j}$, the C# Inference Engine queries the $j$-th row of the transition matrix. The engine selects the mode of this conditional distribution—identifying the highest probability $p_{ij}$—and uses it as the predicted user move to execute its counter-strategy.
