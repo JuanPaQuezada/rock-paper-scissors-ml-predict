@@ -18,8 +18,7 @@ At the core of the heuristic pipeline is a square stochastic matrix $P$ where ea
 $$ \sum_i P_{ij}=1 $$
 
 **Real-Time Maximum Likelihood Estimation (MLE)**
-As the user plays, the Data Pipeline continuously captures the state transitions. To keep the model lightweight and fast, the transition matrix is dynamically estimated in real-time using a Maximum Likelihood Estimator (MLE) approach. The C# producer-consumer queue updates the transition counts $n_{ij}$ (the number of times the user transitioned from state $i$ to state $j$). The transition probability is thus calculated continuously as:
-p_hat_ij^MLE = n_ij / sum(n_iu) para u=1 hasta k
+As the user plays, the Data Pipeline continuously captures the state transitions. To keep the model lightweight and fast, the transition matrix is dynamically estimated in real-time using a Maximum Likelihood Estimator (MLE) approach. The C# producer-consumer queue updates the transition counts $n_{ij}$ (the number of times the user transitioned from state $i$ to state $j$). The transition probability is thus calculated continuously.
 
 
 **Inference and Counter-Move Prediction**
