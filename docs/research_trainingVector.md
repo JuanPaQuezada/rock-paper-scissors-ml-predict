@@ -46,3 +46,10 @@ flowchart LR
     F -->|Updates TD Error & Weights| C
     F -->|Safe UI Broadcast| A
 ```
+### Reinforcement Learning
+
+Reinforcement Learning (RL) is a branch of ML that focuses on how agents can learn to make decisions through trial and error to maximize cumulative rewards. RL allows machines to learn by interacting with an environment and receiving feedback based on their actions. Unlike supervised learning, which relies on a training dataset with predefined answers, RL involves learning through experience. 
+
+<div align="center">
+<img src="https://sendbird.imgix.net/cms/Figure-4.-Machine-learning-reinforcement-learning-diagram.png" width="777" alt="Logo pequeño">
+</div>
