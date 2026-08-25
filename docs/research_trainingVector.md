@@ -22,43 +22,42 @@ As the user plays, the Data Pipeline continuously captures the state transitions
 
 **Inference and Counter-Move Prediction**
 During the inference phase, the AI must predict the user's next action to select the optimal counter-move. Given the user's current state $X_{t}=s_{j}$, the C# Inference Engine queries the $j$-th row of the transition matrix. The engine selects the mode of this conditional distribution—identifying the highest probability $p_{ij}$—and uses it as the predicted user move to execute its counter-strategy.
-
 graph TD
-    subgraph C_Sharp_Environment [C# .NET Environment (State & Concurrency)]
-        UI[UI / MVP (Main Thread)]
+    subgraph C_Sharp_Environment ["C# .NET Environment (State and Concurrency)"]
+        UI["UI / MVP (Main Thread)"]
         
-        subgraph TPL_Pipelines [TPL Background Tasks]
-            DataPipe[Data Pipeline\n(Thread-Safe Queue)]
-            InfPipe[Inference Engine\n(Decision & Policy)]
-            RLPipe[RL Training Pipeline\n(TD Error & MSE)]
+        subgraph TPL_Pipelines ["TPL Background Tasks"]
+            DataPipe["Data Pipeline<br>(Thread-Safe Queue)"]
+            InfPipe["Inference Engine<br>(Decision and Policy)"]
+            RLPipe["RL Training Pipeline<br>(TD Error and MSE)"]
         end
         
-        State[(Shared Memory:\nHistory Vector & RL Weights)]
+        State[("Shared Memory:<br>History Vector and RL Weights")]
     end
 
-    subgraph R_Environment [R Stateless Compute Engine]
-        R_Script[Rscript.exe\n(markovchain package)]
+    subgraph R_Environment ["R Stateless Compute Engine"]
+        R_Script["Rscript.exe<br>(markovchain package)"]
     end
 
     %% Flujo de Ingesta de Datos
-    UI -- "User plays '1' (Rock)" --> DataPipe
-    DataPipe -- "Updates Thread-Safe History" --> State
+    UI -->|"User plays 1 (Rock)"| DataPipe
+    DataPipe -->|"Updates Thread-Safe History"| State
     
     %% Flujo de Delegación (El Puente)
-    State -- "Serializes history\ne.g., '1,2,1,3,1'" --> InfPipe
-    InfPipe -- "Process.Start()\nPass string as args" --> R_Script
+    State -->|"Serializes history<br>e.g., 1,2,1,3,1"| InfPipe
+    InfPipe -->|"Process.Start()<br>Pass string as args"| R_Script
     
     %% Flujo de Cálculo en R
-    R_Script -. "1. Builds Transition Matrix\n2. Calculates MLE\n3. Finds max probability" .- R_Script
-    R_Script -- "Console Output:\nPredicted User Move: '1'" --> InfPipe
+    R_Script -.->|"1. Builds Transition Matrix<br>2. Calculates MLE<br>3. Finds max probability"| R_Script
+    R_Script -->|"Console Output:<br>Predicted User Move: 1"| InfPipe
     
     %% Flujo de Decisión AI y UI
-    InfPipe -- "Selects Counter-Move: '2' (Paper)\nApplies Epsilon Noise" --> UI
+    InfPipe -->|"Selects Counter-Move: 2 (Paper)<br>Applies Epsilon Noise"| UI
     
     %% Flujo de Actualización Simulated RL
-    UI -- "Round resolves (Reward)" --> RLPipe
-    RLPipe -- "Updates mathematical weights\nCalculates TD Error" --> State
-    RLPipe -- "Event Broadcast\n(Safe UI Marshalling)" --> UI
+    UI -->|"Round resolves (Reward)"| RLPipe
+    RLPipe -->|"Updates mathematical weights<br>Calculates TD Error"| State
+    RLPipe -->|"Event Broadcast<br>(Safe UI Marshalling)"| UI
 
     %% Estilos
     classDef csharp fill:#1e88e5,stroke:#0d47a1,stroke-width:2px,color:white;
