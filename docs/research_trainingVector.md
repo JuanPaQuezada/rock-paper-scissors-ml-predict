@@ -22,6 +22,7 @@ As the user plays, the Data Pipeline continuously captures the state transitions
 
 **Inference and Counter-Move Prediction**
 During the inference phase, the AI must predict the user's next action to select the optimal counter-move. Given the user's current state $X_{t}=s_{j}$, the C# Inference Engine queries the $j$-th row of the transition matrix. The engine selects the mode of this conditional distribution—identifying the highest probability $p_{ij}$—and uses it as the predicted user move to execute its counter-strategy.
+```mermaid
 graph TD
     subgraph C_Sharp_Environment ["C# .NET Environment (State and Concurrency)"]
         UI["UI / MVP (Main Thread)"]
@@ -67,3 +68,4 @@ graph TD
     class UI,DataPipe,InfPipe,RLPipe csharp;
     class R_Script rlang;
     class State mem;
+```
