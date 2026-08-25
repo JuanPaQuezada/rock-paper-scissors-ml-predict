@@ -22,7 +22,6 @@ As the user plays, the Data Pipeline continuously captures the state transitions
 $$\begin{equation}
 \hat{p}_{ij}^{MLE} = \frac{n_{ij}}{\sum_{u = 1}^k n_{iu}}
 \end{equation}$$
-$$ \hat{p}_{ij}^{MLE} = \frac{n_{ij}}{\sum_{u = 1}^k n_{iu}} $$
 
 **Inference and Counter-Move Prediction**
 During the inference phase, the AI must predict the user's next action to select the optimal counter-move. Given the user's current state $X_{t}=s_{j}$, the C# Inference Engine queries the $j$-th row of the transition matrix. The engine selects the mode of this conditional distribution—identifying the highest probability $p_{ij}$—and uses it as the predicted user move to execute its counter-strategy.
