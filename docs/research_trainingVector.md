@@ -46,6 +46,46 @@ flowchart LR
     F -->|Updates TD Error & Weights| C
     F -->|Safe UI Broadcast| A
 ```
+## Online Learning & Progressive Vector Mechanics
+
+Unlike traditional machine learning models that require massive pre-existing datasets to function, this system implements **Online Learning**. The model learns "on-the-fly", meaning its intelligence and prediction accuracy scale progressively with every iteration of the game.
+
+### 1. The 100-Position State Vector
+The core of the AI's memory is a dynamically updated vector with a maximum capacity of 100 positions. It represents the AI's short-to-medium-term memory of the human player's behavior. 
+At the start of the execution, the vector is completely empty. Each index records a specific user move mapped to a numerical value:
+* `1` = Rock
+* `2` = Paper
+* `3` = Scissors
+
+Crucially, the 100-size limit is a **capacity ceiling**, not a requirement to start playing. The algorithm uses a dynamic pointer to track exactly how many positions contain valid data.
+
+### 2. Simulated Training & The 3-Position Baseline
+The simulated training is an iterative process that begins immediately, but the inference engine requires a minimum **Baseline** of data to calculate a valid Markov transition.
+
+* **Rounds 1 to 3 (Baseline Phase):** The human plays, and the C# Data Pipeline simply collects the inputs without attempting intelligent predictions (the AI plays randomly). The vector populates sequentially:
+  * *Round 1:* Human plays Rock (`1`) $\rightarrow$ Vector: `[1, 0, 0, 0...]`
+  * *Round 2:* Human plays Paper (`2`) $\rightarrow$ Vector: `[1, 2, 0, 0...]`
+  * *Round 3:* Human plays Rock (`1`) $\rightarrow$ Vector: `[1, 2, 1, 0...]`
+* **Round 4 Onwards (Active Inference Phase):** The vector now contains enough sequential data to form a Discrete-Time Markov Chain (DTMC). The C# engine begins serializing the populated segment of the vector (e.g., `[1, 2, 1]`) and delegating it to the R script. As rounds progress, this segment grows, rendering the statistical predictions increasingly robust.
+
+### 3. Markov Strategy & Counter-Move Prediction
+To predict the next move, the R engine looks at the human's last action and searches the populated vector for historical precedents—specifically, what the human played *immediately after* that action in the past.
+
+**Practical Example (Round 4):**
+Assume the current vector state is `[1, 2, 1]` and the human just played Rock (`1`) in Round 3.
+1. The R engine traverses the memory looking for instances of `1`.
+2. It finds a `1` at index `0`. The subsequent move at index `1` was a `2` (Paper).
+3. It finds another `1` at index `2`, but as it is the latest move, there is no subsequent data yet.
+4. Based on this limited transition matrix, the engine calculates a 100% historical probability that the user transitions from `1` (Rock) to `2` (Paper). 
+
+The R script outputs: *"Predicted user move: 2"*. The C# Inference Engine receives this, deduces the optimal counter-move, and selects **Scissors (`3`)**.
+
+> **Note on Epsilon-Greedy Policy:** During early rounds (e.g., Rounds 4-10) where data is scarce, the mathematical prediction is highly susceptible to noise. The AI applies an Epsilon-Greedy exploration parameter to occasionally inject random counter-moves, preventing the AI from becoming entirely predictable while the vector builds a reliable sample size.
+
+### 4. The 100-Round Limit: Circular Memory (Ring Buffer)
+To prevent memory overflow and allow the AI to adapt to changing human strategies, the vector implements a **Sliding Window (Ring Buffer)** approach once it reaches its 100-round capacity.
+
+At Round 101, the system does not crash or reset. The C# Data Pipeline simply dequeues the oldest historical move (at index `0`), shifts all remaining data backwards, and enqueues the newest move at index `99`. This ensures the R engine always calculates the Markov transition probabilities based on the user's 100 most recent actions, effectively allowing the AI to "forget" obsolete behavioral patterns.
 ### Reinforcement Learning
 
 Reinforcement Learning (RL) is a branch of ML that focuses on how agents can learn to make decisions through trial and error to maximize cumulative rewards. RL allows machines to learn by interacting with an environment and receiving feedback based on their actions. Unlike supervised learning, which relies on a training dataset with predefined answers, RL involves learning through experience. 
