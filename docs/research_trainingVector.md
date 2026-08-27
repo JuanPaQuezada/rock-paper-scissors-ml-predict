@@ -94,8 +94,17 @@ Reinforcement Learning (RL) is a branch of ML that focuses on how agents can lea
 <img src="https://sendbird.imgix.net/cms/Figure-4.-Machine-learning-reinforcement-learning-diagram.png" width="777" alt="RL image">
 </div>
 
-## Technical Investigation: Windows Forms MVP Interface & Asynchronous Game Loop
-# 1. Executive Summary & Objective
+# Technical Investigation: Windows Forms MVP Interface & Asynchronous Game Loop
+## 1. Executive Summary & Objective
 The purpose of this technical investigation is to define the architecture and implementation strategy for Phase 4: MVP Interface & Asynchronous Game Loop within a C# Windows Forms (.NET) application.
 
 The primary objective is to deliver a responsive, user-facing Minimum Viable Product (MVP) interface that captures user input, displays game outcomes, visualizes real-time performance metrics (specifically Temporal Difference (TD) error and Mean Squared Error (MSE)), and provides secondary analytical views for AI rate models—all while maintaining an uninterrupted, non-blocking UI thread.
+
+| Component | Technical Objective | Recommended C# / WinForms Mechanism | Concurrency Strategy |
+| :--- | :--- | :--- | :--- |
+| **Async Game Loop** | Continuous execution of game mechanics and simulation cycles | `async Task RunGameLoopAsync(CancellationToken ct)` | Background worker thread (`Task.Run`) |
+| **TD Error & MSE Computation** | Real-time calculation of reinforcement learning loss / error metrics | `TransformBlock<RawStepData, MetricTelemetry>` | TPL Dataflow worker threads |
+| **Graphic Renderer** | Dynamic plotting of TD error and MSE curves | `ScottPlot.FormsPlot` / `Chart (FastLine)` | Synchronized UI `ActionBlock` or `IProgress<T>` |
+| **Emerged AI Rate Window** | Dedicated diagnostic window for AI model metrics | Non-modal Form (`Show()`) with custom viewport | Event subscription via UI Synchronization Context |
+| **Input Ingestion** | Capture user actions and enqueue them for simulation processing | `Channel<UserInput>` or `ConcurrentQueue<UserInput>` | Producer-Consumer thread-safe queue |
+| **Pipeline Interruption** | Responsive stopping, resetting, or pausing of simulation | `CancellationTokenSource.Cancel()` | Cooperative token checking within loop |
