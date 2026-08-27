@@ -86,13 +86,26 @@ The R script outputs: *"Predicted user move: 2"*. The C# Inference Engine receiv
 To prevent memory overflow and allow the AI to adapt to changing human strategies, the vector implements a **Sliding Window (Ring Buffer)** approach once it reaches its 100-round capacity.
 
 At Round 101, the system does not crash or reset. The C# Data Pipeline simply dequeues the oldest historical move (at index `0`), shifts all remaining data backwards, and enqueues the newest move at index `99`. This ensures the R engine always calculates the Markov transition probabilities based on the user's 100 most recent actions, effectively allowing the AI to "forget" obsolete behavioral patterns.
-### Reinforcement Learning
+
+## Reinforcement Learning
 
 Reinforcement Learning (RL) is a branch of ML that focuses on how agents can learn to make decisions through trial and error to maximize cumulative rewards. RL allows machines to learn by interacting with an environment and receiving feedback based on their actions. Unlike supervised learning, which relies on a training dataset with predefined answers, RL involves learning through experience. 
 
 <div align="center">
 <img src="https://sendbird.imgix.net/cms/Figure-4.-Machine-learning-reinforcement-learning-diagram.png" width="777" alt="RL image">
 </div>
+
+### Simulated RL Pipeline & Heuristic Vector-Based Learning
+In this architecture, rather than deploying heavyweight ML frameworks or training deep neural networks, we implement a simulated RL pipeline. The system utilizes heuristic, vector-based learning by directly updating numerical weights within a dedicated state vector. This background process mimics an optimization algorithm, continuously adjusting scoring parameters dynamically as the application executes.
+
+* **Reward Function Implementation:**
+To drive this continuous learning loop, the system relies on a simulated reward function. A long-running background `Task` evaluates the agent's actions and applies this function directly to the vector's parameters. For example, assigning a +1 reward for a win and a -1 penalty for a loss. This allows the model's policy to adapt on the fly.
+
+* **Error Measurement (Raw Math Integration):**
+Evaluating the performance of our heuristic learning relies on calculating simulated Temporal Difference (TD) error and Mean Squared Error (MSE). Crucially, these metrics are computed using raw mathematical logic derived from the vector's expected outcome versus the actual outcome after each state transition. This ensures accurate error measurement without introducing dependencies on external machine learning libraries.
+
+* **Concurrency and Thread-Safe Memory Management:**
+Because the simulated learning loop updates vector scores continuously in the background while the inference engine reads them, strict memory protection is required to prevent data corruption. The architecture implements thread-safe memory locks, specifically leveraging `ReaderWriterLockSlim`. This synchronization primitive ensures that the vector values are updated safely without throwing concurrency exceptions, seamlessly maintaining the non-blocking nature of the game loop.
 
 ## Windows Forms MVP Interface & Asynchronous Game Loop
 ### 1. Executive Summary & Objective
