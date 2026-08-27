@@ -101,11 +101,24 @@ In this architecture, rather than deploying heavyweight ML frameworks or trainin
 * **Reward Function Implementation:**
 To drive this continuous learning loop, the system relies on a simulated reward function. A long-running background `Task` evaluates the agent's actions and applies this function directly to the vector's parameters. For example, assigning a +1 reward for a win and a -1 penalty for a loss. This allows the model's policy to adapt on the fly.
 
-* **Error Measurement (Raw Math Integration):**
-Evaluating the performance of our heuristic learning relies on calculating simulated Temporal Difference (TD) error and Mean Squared Error (MSE). Crucially, these metrics are computed using raw mathematical logic derived from the vector's expected outcome versus the actual outcome after each state transition. This ensures accurate error measurement without introducing dependencies on external machine learning libraries.
+### Mathematical Error Metrics: TD Error and MSE
 
-* **Concurrency and Thread-Safe Memory Management:**
-Because the simulated learning loop updates vector scores continuously in the background while the inference engine reads them, strict memory protection is required to prevent data corruption. The architecture implements thread-safe memory locks, specifically leveraging `ReaderWriterLockSlim`. This synchronization primitive ensures that the vector values are updated safely without throwing concurrency exceptions, seamlessly maintaining the non-blocking nature of the game loop.
+In the absence of commercial Machine Learning frameworks, the inference engine relies on raw mathematical logic to evaluate and adjust the agent's performance. The continuous learning cycle is governed by two primary metrics calculated within the background asynchronous tasks: Temporal Difference (TD) Error and Mean Squared Error (MSE).
+
+#### 1. Temporal Difference (TD) Error
+The TD Error serves as the immediate feedback signal for the algorithm, measuring the variance between the model's expected outcome and the actual result after an action is executed.
+
+* **Mathematical Concept:** In this heuristic approach, the formula is simplified to $\delta = R_{t} - V(S_t)$, where $\delta$ represents the TD error, $R_t$ is the actual simulated reward, and $V(S_t)$ is the expected value currently assigned to that state within the vector.
+* **Project Application:** When a round resolves, the asynchronous pipeline assigns a simulated reward (e.g., +1 for a win, -1 for a loss). If the vector's expected outcome severely mismatched the actual result, a large TD error is generated. This numerical value is applied directly to the memory vector's weights to correct its future policy behavior.
+
+#### 2. Mean Squared Error (MSE)
+While the TD Error evaluates the immediate accuracy of a single transition, the MSE measures the overall stability and convergence of the AI's learning over time.
+
+* **Mathematical Concept:** The MSE averages the squares of recent errors using the formula $\text{MSE} = \frac{1}{n} \sum_{i=1}^{n} (Y_i - \hat{Y}_i)^2$. By squaring the errors, this metric severely penalizes highly inaccurate predictions and consistently yields a positive value, making it ideal for visualizing a loss curve.
+* **Project Application:** The data processing pipeline aggregates the most recent TD errors calculated. If the agent consistently counters the user using the Markov transition baseline, the errors approach zero, and the MSE curve drops. Conversely, if the user abruptly changes strategies, the MSE spikes, signaling that the 100-position circular memory vector is actively adapting to new behavioral patterns.
+
+### **Concurrency and Thread-Safe Memory Management**
+Because the state vectors and transition matrices reside in shared memory, the raw mathematical calculations for $\delta$ and $\text{MSE}$ are executed inside `TransformBlock` instances within the TPL Dataflow pipeline. To maintain structural integrity, the `ReaderWriterLockSlim` primitive is strictly enforced. This ensures that while the background mathematical computations update the vector weights based on the TD Error, the UI layer can safely read these values for real-time charting (e.g., rendering the MSE curve via ScottPlot) without encountering race conditions or reading partially updated data.
 
 ## Windows Forms MVP Interface & Asynchronous Game Loop
 ### 1. Executive Summary & Objective
