@@ -218,3 +218,25 @@ There are variations of this algorithm such as the decaying one, which solves th
 We are going to implement this logic by saving only the data when the machine wins, so the vector keeps the transitions that already proved to be useful for the prediction. This means the 100 positions hold the last 100 **confirmed** transitions, not the last 100 raw rounds: a round where our prediction failed is still played and resolved normally, but it does not occupy a position in the memory. As a consequence the vector fills slower than the number of rounds played, roughly one position every two or three rounds.
 
 Applied to our project, epsilon matters the most at the beginning. On the first rounds the vector is almost empty and any transition we calculate is based on two or three observations, so trusting it completely would be a mistake. Starting with a high epsilon and decreasing it as the vector fills up gives us random moves while we don't know anything about the player, and progressively more calculated moves as the sample grows.
+
+---
+
+## 11. Author
+
+**Juan Pablo Quezada**
+B.Sc. in Intelligent Computing Engineering
+Universidad Autónoma de Aguascalientes (UAA)
+
+**Axel Armando Belin Castorena**
+B.Sc. in Intelligent Computing Engineering
+Universidad Autónoma de Aguascalientes (UAA)
+
+**Brandon Alejandro Herrera Rodriguez**
+B.Sc. in Intelligent Computing Engineering
+Universidad Autónoma de Aguascalientes (UAA)
+
+**Ian Christopher Hernandez Mera**
+B.Sc. in Intelligent Computing Engineering
+Universidad Autónoma de Aguascalientes (UAA)
+
+---
