@@ -100,12 +100,27 @@ The purpose of this technical investigation is to define the architecture and im
 
 The primary objective is to deliver a responsive, user-facing Minimum Viable Product (MVP) interface that captures user input, displays game outcomes, visualizes real-time performance metrics (specifically Temporal Difference (TD) error and Mean Squared Error (MSE)), and provides secondary analytical views for AI rate models—all while maintaining an uninterrupted, non-blocking UI thread.
 
-###2. Core Functional Requirements
+### 2. Core Functional Requirements
 
 * Interactive State & Outcome Rendering: Capture real-time user inputs, process them through the execution pipeline, and render continuous simulation/game state updates.
 * Real-Time Analytical Graphics: Plot dynamic TD error and MSE curves as the backend simulation progresses.
 * AI Model Inspection (Emerged Windows): Provide modular, secondary window views (e.g., dedicated diagnostic windows) to inspect AI rate models and internal policy distributions without halting primary simulation cycles.
 * Asynchronous & Non-Blocking Architecture: Decouple the UI thread from computational workloads (AI evaluations, loss calculations, data streaming) to avoid interface freezing or frame drops.
+
+### 3. Concurrency & Pipeline Architecture
+#### 3.1. Threading Paradigms (async/await & IProgress<T>)
+
+* Asynchronous Game Loop: Game ticks, agent decision cycles, and gradient updates must execute inside worker tasks via Task.Run() or dedicated loop runners managed by CancellationTokenSource.
+* Thread-Safe Telemetry Dispatch: Direct cross-thread control manipulation violates Windows Forms thread safety (InvalidOperationException). UI updates must be marshaled using Progress<T> / IProgress<T> or event dispatchers synchronized with the UI thread context.
+
+#### 3.2. Dataflow Pipeline Pattern (TPL Dataflow)
+To structure data exchange between background simulation tasks and the UI layer, the architecture leverages the Task Parallel Library (TPL) Dataflow model (System.Threading.Tasks.Dataflow).
+
+* Actor/Message-Passing Model: Data points (raw states, reward signals, model updates) are posted into pipeline blocks rather than handled through tightly coupled method invocations.
+* Background Processing (TransformBlock<TInput, TOutput>): Computes TD errors, MSE variations, and metric aggregations across pooled worker threads.
+* UI Synchronization (ActionBlock<TInput>): Terminal blocks bound to TaskScheduler.FromCurrentSynchronizationContext() handle GUI elements, chart updates, and emerged inspection windows directly on the UI message loop without manual Control.Invoke() calls.
+* Flow Control & Cancellation: Conditional routing (LinkTo with predicates) handles valid simulation metrics and operational cancellations via CancellationToken.
+
 
 | Component | Technical Objective | Recommended C# / WinForms Mechanism | Concurrency Strategy |
 | :--- | :--- | :--- | :--- |
