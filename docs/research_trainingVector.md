@@ -167,3 +167,54 @@ To structure data exchange between background simulation tasks and the UI layer,
 | **Emerged AI Rate Window** | Dedicated diagnostic window for AI model metrics | Non-modal Form (`Show()`) with custom viewport | Event subscription via UI Synchronization Context |
 | **Input Ingestion** | Capture user actions and enqueue them for simulation processing | `Channel<UserInput>` or `ConcurrentQueue<UserInput>` | Producer-Consumer thread-safe queue |
 | **Pipeline Interruption** | Responsive stopping, resetting, or pausing of simulation | `CancellationTokenSource.Cancel()` | Cooperative token checking within loop |
+
+### 6. Semirandom Algorithm (Epsilon-Greedy Policy)
+
+It's a hybrid decision-making framework that deliberately combines the deterministic logic with a controlled dose of random chance.
+
+This is defined by a probability split controlled by a single numerical value called epsilon
+
+Epsilon is defined by a single number that controls the AI randomness level, its decimal value on the interval of 0 to 1.0 (which represents the percentage).
+
+**For example:**
+
+> ε = 0.2. It means that we got a 20% chance of exploration (the AI plays a random move, so it generates new data instead of repeating what it already knows) and 80% exploitation (the AI decides by comparing the data it already has).
+
+Even if the model is completely trained we can't just set epsilon to 0, because we fall into a case where the AI always repeats the action that looks best right now, it never tries the ones it has less information about, and it stops learning anything new.
+
+#### Time line
+
+Before going deeper into how epsilon greedy works, it's worth looking at where it comes from. This algorithm didn't appear out of nowhere, it's the result of almost two centuries of work on the same question: how to decide when you don't have complete information. The timeline below shows the main steps that lead to it, from the statistical base that lets us model uncertainty, up to the modern proofs that show the method actually converges.
+
+![Evolution of Reinforcement Learning: Q-Learning & Epsilon-Greedy](./images/Evolution_Intelligent_Learning.jpeg)
+
+Each point of the timeline adds something that epsilon greedy needs to exist:
+
+- **19th Century** — Gaussian Distribution (Gauss): gives us the statistical base to model uncertainty and reward distributions. Without a way to represent that our estimations are noisy, there is no reason to explore at all.
+- **1950s** — Bellman Equation (Bellman): introduces the recursive equation for optimal decision making. This is what lets us talk about the value of an action instead of only its immediate result.
+- **1989** — Q-Learning (Watkins): computers learn by trial and error without needing a model of the world. This is where the estimated values that our agent compares actually come from.
+- **1992** — REINFORCE (Williams): establishes model-free policy gradient techniques, another family of methods attacking the same problem.
+- **1998** — Epsilon-Greedy formalized (Sutton & Barto): the strategy gets formalized as the balance between exploring new options and exploiting the rewards we already know. This is the version we are using on the project.
+- **2015** — Deep Q-Networks (DeepMind): Q-Learning combined with neural networks, good enough to defeat humans at Atari games.
+- **2022** — Deep Epsilon-Greedy convergence: mathematical proof of error bounds and convergence for deep policy learning.
+
+For our project we are staying on the 1998 step. We don't need neural networks or deep policies, we only need the balance between exploration and exploitation applied to a vector.
+
+#### The Epsilon-Greedy Algorithm
+
+This is the algorithm that we will be using on the project, It functions as a hybrid framework that balances using current knowledge to maximize rewards while maintaining a "trick" of randomness to discover better options.
+
+The algorithm operates through a simple probability split for every decision (action a at time t):
+
+- **Exploitation (Probability 1 − ε):** The agent selects the "greedy" action—the one with the highest estimated value based on past rewards.
+- **Exploration (Probability ε):** The agent ignores what it knows and picks a completely random action. This is the part that lets it discover options that look bad right now only because we haven't tried them enough times to have a real estimation of them.
+
+This "constant trickle of randomness" ensures that every action is sampled an infinite number of times as t increases, which mathematically guarantees that the agent's estimates will eventually converge to the true values of the actions.
+
+There are variations of this algorithm such as the decaying one, which solves the problem of noisy data: epsilon will start with the highest value (1) and will be decreasing as the information is saved.
+
+#### Implementation on our project
+
+We are going to implement this logic by saving only the data when the machine wins, so the vector keeps the transitions that already proved to be useful for the prediction. This means the 100 positions hold the last 100 **confirmed** transitions, not the last 100 raw rounds: a round where our prediction failed is still played and resolved normally, but it does not occupy a position in the memory. As a consequence the vector fills slower than the number of rounds played, roughly one position every two or three rounds.
+
+Applied to our project, epsilon matters the most at the beginning. On the first rounds the vector is almost empty and any transition we calculate is based on two or three observations, so trusting it completely would be a mistake. Starting with a high epsilon and decreasing it as the vector fills up gives us random moves while we don't know anything about the player, and progressively more calculated moves as the sample grows.
