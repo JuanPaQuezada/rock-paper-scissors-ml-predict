@@ -1,4 +1,4 @@
-### RESEARCH ML WITH VECTOR
+# RESEARCH ML WITH VECTOR
 ## Architectural Research & Concurrency Rationale
 
 The architecture of this simulated Reinforcement Learning environment is heavily anchored in the Task Parallel Library (TPL) and its Dataflow components. By utilizing TPL Dataflow, the system establishes a robust, actor-based pipeline for the Data Engineering phase. Rather than blocking the main execution thread while processing the user's input, the architecture implements a producer-consumer model through in-process message passing. This ensures that state transitions and data ingestion are handled asynchronously as soon as the data becomes available, maintaining a perfectly fluid and non-blocking game interface regardless of the mathematical computations occurring in the background.
@@ -94,7 +94,7 @@ Reinforcement Learning (RL) is a branch of ML that focuses on how agents can lea
 <img src="https://sendbird.imgix.net/cms/Figure-4.-Machine-learning-reinforcement-learning-diagram.png" width="777" alt="RL image">
 </div>
 
-## Technical Investigation: Windows Forms MVP Interface & Asynchronous Game Loop
+## Windows Forms MVP Interface & Asynchronous Game Loop
 ### 1. Executive Summary & Objective
 The purpose of this technical investigation is to define the architecture and implementation strategy for Phase 4: MVP Interface & Asynchronous Game Loop within a C# Windows Forms (.NET) application.
 
