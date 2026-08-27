@@ -121,6 +121,16 @@ To structure data exchange between background simulation tasks and the UI layer,
 * UI Synchronization (ActionBlock<TInput>): Terminal blocks bound to TaskScheduler.FromCurrentSynchronizationContext() handle GUI elements, chart updates, and emerged inspection windows directly on the UI message loop without manual Control.Invoke() calls.
 * Flow Control & Cancellation: Conditional routing (LinkTo with predicates) handles valid simulation metrics and operational cancellations via CancellationToken.
 
+### 4. Visualization & Component Strategy
+
+* High-Performance Charting (TD Error & MSE):
+    * ScottPlot (ScottPlot.WinForms): Recommended for streaming signal data and real-time scatter/line rendering with minimal CPU overhead.
+    * Standard Charting (System.Windows.Forms.DataVisualization.Charting): Alternative option utilizing FastLine series with data point batching.
+
+* Emerged Windows (AI Rate Model View):
+    * Non-modal child forms instantiated via form.Show(this) or dockable analytical panels.
+    * Subscribed to the metric stream to display updated weights, rate curves, and decision boundaries independently of the primary game window.
+
 
 | Component | Technical Objective | Recommended C# / WinForms Mechanism | Concurrency Strategy |
 | :--- | :--- | :--- | :--- |
