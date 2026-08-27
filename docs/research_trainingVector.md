@@ -223,7 +223,7 @@ Applied to our project, epsilon matters the most at the beginning. On the first 
 
 ## 11. Author
 
-**Juan Pablo Quezada**
+**Juan Pablo Quezada JImenez**
 B.Sc. in Intelligent Computing Engineering
 Universidad Autónoma de Aguascalientes (UAA)
 
