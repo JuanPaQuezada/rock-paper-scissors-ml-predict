@@ -94,11 +94,18 @@ Reinforcement Learning (RL) is a branch of ML that focuses on how agents can lea
 <img src="https://sendbird.imgix.net/cms/Figure-4.-Machine-learning-reinforcement-learning-diagram.png" width="777" alt="RL image">
 </div>
 
-# Technical Investigation: Windows Forms MVP Interface & Asynchronous Game Loop
-## 1. Executive Summary & Objective
+## Technical Investigation: Windows Forms MVP Interface & Asynchronous Game Loop
+### 1. Executive Summary & Objective
 The purpose of this technical investigation is to define the architecture and implementation strategy for Phase 4: MVP Interface & Asynchronous Game Loop within a C# Windows Forms (.NET) application.
 
 The primary objective is to deliver a responsive, user-facing Minimum Viable Product (MVP) interface that captures user input, displays game outcomes, visualizes real-time performance metrics (specifically Temporal Difference (TD) error and Mean Squared Error (MSE)), and provides secondary analytical views for AI rate models—all while maintaining an uninterrupted, non-blocking UI thread.
+
+###2. Core Functional Requirements
+
+* Interactive State & Outcome Rendering: Capture real-time user inputs, process them through the execution pipeline, and render continuous simulation/game state updates.
+* Real-Time Analytical Graphics: Plot dynamic TD error and MSE curves as the backend simulation progresses.
+* AI Model Inspection (Emerged Windows): Provide modular, secondary window views (e.g., dedicated diagnostic windows) to inspect AI rate models and internal policy distributions without halting primary simulation cycles.
+* Asynchronous & Non-Blocking Architecture: Decouple the UI thread from computational workloads (AI evaluations, loss calculations, data streaming) to avoid interface freezing or frame drops.
 
 | Component | Technical Objective | Recommended C# / WinForms Mechanism | Concurrency Strategy |
 | :--- | :--- | :--- | :--- |
