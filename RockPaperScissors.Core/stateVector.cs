@@ -15,6 +15,7 @@ public class stateVector
     {
         _capacidadDatos = capacidadDatos;
         _vector = new int[_capacidadDatos];
+        
         cabezalVector = 0;
         contador_jugadas = 0;
     }
@@ -62,3 +63,4 @@ public class stateVector
     }
     
 }
+
