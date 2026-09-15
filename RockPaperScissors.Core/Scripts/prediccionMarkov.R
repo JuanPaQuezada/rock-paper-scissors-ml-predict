@@ -12,7 +12,12 @@ for(i in 1:(length(vector)-1)){
     matriz_laplace[vector[i],vector[i+1]]<-matriz_laplace[vector[i],vector[i+1]]+1
 }
 
+estado_actual<-vector[length(vector)]
+fila_actual<-matriz_laplace[estado_actual, ]
+
 indice_frecuencia_alta=which.max(matriz_laplace[vector[length(vector)],])
+probabilidad<-fila_actual[indice_frecuencia_alta] / sum(fila_actual)
+
 if(indice_frecuencia_alta==1){
     contra_movimiento<-2
 }else if(indice_frecuencia_alta==2){
@@ -21,4 +26,4 @@ if(indice_frecuencia_alta==1){
     contra_movimiento<-1
 }
 
-cat(contra_movimiento)
+cat(contra_movimiento, ",", round(probabilidad, 4), sep="")
