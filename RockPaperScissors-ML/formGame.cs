@@ -1,4 +1,5 @@
-﻿using System;
+﻿using RockPaperScissors_ML;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -9,9 +10,11 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace RockPaperScissors_ML
-{
+{ 
     public partial class formGame : Form
     {
+        private MetricsForm _ventanaMetricas;
+
         public formGame()
         {
             InitializeComponent();
@@ -44,7 +47,15 @@ namespace RockPaperScissors_ML
 
         private void pictureBox2_Click(object sender, EventArgs e)
         {
-
+            if (_ventanaMetricas == null || _ventanaMetricas.IsDisposed)
+            {
+                _ventanaMetricas = new MetricsForm();
+                _ventanaMetricas.Show();
+            }
+            else
+            {
+                _ventanaMetricas.BringToFront();
+            }
         }
     }
 }
