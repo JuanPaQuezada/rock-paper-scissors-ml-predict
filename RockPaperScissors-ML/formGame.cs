@@ -46,5 +46,20 @@ namespace RockPaperScissors_ML
         {
 
         }
+
+        private void btnRock_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void btnPaper_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void btnScissors_Click(object sender, EventArgs e)
+        {
+
+        }
     }
 }
