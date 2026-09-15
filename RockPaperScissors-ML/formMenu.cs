@@ -7,24 +7,21 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using static System.Windows.Forms.DataFormats;
 
 namespace RockPaperScissors_ML
 {
-    public partial class Login : Form
+    public partial class formMenu : Form
     {
-        public Login()
+        public formMenu()
         {
             InitializeComponent();
             this.DoubleBuffered = true;
             this.MinimumSize = new Size(640, 480);
-        }
-
-        private void Login_Load(object sender, EventArgs e)
-        {
 
         }
 
-        private void Login_Resize(object sender, EventArgs e)
+        private void formMenu_Resize(object sender, EventArgs e)
         {
             if (this.WindowState == FormWindowState.Normal)
             {
@@ -38,6 +35,19 @@ namespace RockPaperScissors_ML
 
                 this.ResumeLayout();
             }
+
+        }
+
+        private void pictureBox2_Click(object sender, EventArgs e)
+        {
+            formGame formGame = new formGame();
+            formGame.Show();
+            this.Hide();
+        }
+
+        private void pictureBox3_Click(object sender, EventArgs e)
+        {
+            Application.Exit();
         }
     }
 }
